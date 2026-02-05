@@ -41,6 +41,21 @@ const App: React.FC = () => {
     }
   }, [isDrawing]);
 
+  // --- Auto-Save Logic ---
+  useEffect(() => {
+    // Only auto-save if we have a filename (file exists) and content
+    if (!currentFilename || !content) return;
+
+    const timer = setTimeout(() => {
+      NoteService.saveNote(currentFilename, content);
+      // Optional: Log to console or subtle indicator, but avoid Toast spam
+      console.log('Auto-saved:', currentFilename);
+    }, 2000); // Wait 2 seconds after stopping typing
+
+    return () => clearTimeout(timer);
+  }, [content, currentFilename]);
+
+
   // --- Navigation Handlers ---
 
   const handleCreateNote = () => {
@@ -71,8 +86,10 @@ const App: React.FC = () => {
   };
 
   const handleBackToList = () => {
-    // Optional: Auto-save or prompt could go here. 
-    // For now, we rely on manual save to be explicit.
+    // Manually save one last time before exiting to ensure latest changes are kept
+    if (currentFilename) {
+        NoteService.saveNote(currentFilename, content);
+    }
     setScreen('LIST');
   };
 

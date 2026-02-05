@@ -48,6 +48,8 @@ Here is the recommended **Kotlin** implementation.
 package com.example.eulcauink
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 import com.google.gson.Gson
@@ -123,6 +125,19 @@ class WebAppInterface(private val context: Context) {
     @JavascriptInterface
     fun showToast(msg: String) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    // --- System Actions ---
+    
+    @JavascriptInterface
+    fun openExternalLink(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            showToast("Cannot open link: " + e.message)
+        }
     }
 }
 ```

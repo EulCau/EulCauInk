@@ -29,7 +29,9 @@ export interface AndroidInterface {
   // Deletes a note
   deleteNote(filename: string): boolean;
 
+  // System interactions
   showToast(message: string): void;
+  openExternalLink(url: string): void;
 }
 
 declare global {
