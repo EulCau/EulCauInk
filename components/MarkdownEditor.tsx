@@ -15,7 +15,8 @@ interface MarkdownEditorProps {
   onChange: (val: string) => void;
   viewMode: ViewMode;
   editorRef: React.RefObject<ReactCodeMirrorRef>;
-  readOnly?: boolean; // New prop to disable editor
+  readOnly?: boolean;
+  onNavigate?: (target: string) => void; // New prop for internal navigation
 }
 
 export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ 
@@ -23,7 +24,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   onChange, 
   viewMode, 
   editorRef,
-  readOnly = false
+  readOnly = false,
+  onNavigate
 }) => {
 
   // Editor Extensions
@@ -42,32 +44,58 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   // Handle all link clicks in preview
   const handlePreviewClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
-    // Check if the clicked element is an anchor tag or inside one
     const anchor = target.closest('a');
     
     if (anchor) {
-      const href = anchor.getAttribute('href');
-      if (!href) return;
+      const rawHref = anchor.getAttribute('href');
+      if (!rawHref) return;
 
-      e.preventDefault(); // STOP WebView from navigating
+      // STOP WebView from standard navigation behavior
+      e.preventDefault(); 
+      e.stopPropagation();
 
-      if (href.startsWith('#')) {
-        // --- 1. Internal Anchor (#header) ---
-        const id = href.substring(1);
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      } else if (href.startsWith('http://') || href.startsWith('https://')) {
-        // --- 2. External Link (http...) ---
+      const href = rawHref.trim();
+
+      // 1. External Links (http/https)
+      if (/^https?:\/\//i.test(href)) {
         if (window.Android && window.Android.openExternalLink) {
           window.Android.openExternalLink(href);
         } else {
-          // Web fallback: open in new tab
+          // Web fallback
           window.open(href, '_blank');
         }
+        return;
       }
-      // Note: We ignore other protocols or relative paths for now to prevent crashes
+
+      // 2. Anchor Links (#section)
+      if (href.startsWith('#')) {
+        try {
+          // Decode URI to support Chinese/Special characters (e.g., #%E4%BD%A0%E5%A5%BD -> #你好)
+          const id = decodeURIComponent(href.substring(1));
+          
+          // Try exact match first
+          let element = document.getElementById(id);
+          
+          // Fallback: Try slugified version if exact match fails (rehype-slug usually lowercases and hyphenates)
+          if (!element) {
+             const slugId = id.toLowerCase().replace(/\s+/g, '-');
+             element = document.getElementById(slugId);
+          }
+
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } catch (err) {
+          console.warn("Anchor navigation failed", err);
+        }
+        return;
+      }
+
+      // 3. Internal Note Links (file.md)
+      // If it looks like a relative file link, try to navigate internally
+      if (onNavigate) {
+         onNavigate(href);
+      }
     }
   };
 
@@ -82,8 +110,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             height="100%"
             extensions={extensions}
             onChange={onChange}
-            readOnly={readOnly} // Disables input when drawing
-            editable={!readOnly} // Ensures contenteditable is false on DOM
+            readOnly={readOnly}
+            editable={!readOnly}
             theme="light"
             className="h-full text-base"
             basicSetup={{
@@ -125,7 +153,6 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex, rehypeSlug]}
             components={{
-              // Custom image renderer to ensure styled rendering
               img: ({node, ...props}) => (
                 <span className="block my-4 text-center">
                     {/* eslint-disable-next-line jsx-a11y/alt-text */}

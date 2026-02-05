@@ -93,6 +93,38 @@ const App: React.FC = () => {
     setScreen('LIST');
   };
 
+  // --- Internal Link Navigation (Note to Note) ---
+  const handleNavigate = (linkTarget: string) => {
+    // 1. Decode URL (handles spaces, chinese, etc)
+    const decodedTarget = decodeURIComponent(linkTarget);
+    
+    // 2. Clean filename (remove ./ or leading /)
+    let targetFilename = decodedTarget.replace(/^(\.\/|\/)/, '');
+
+    // 3. Find target note
+    // Try exact match, or title match, or append .md
+    let targetNote = notes.find(n => n.filename === targetFilename);
+    
+    if (!targetNote && !targetFilename.toLowerCase().endsWith('.md')) {
+        targetNote = notes.find(n => n.filename === `${targetFilename}.md`);
+    }
+
+    if (targetNote) {
+        // IMPORTANT: Save current note before switching!
+        if (currentFilename && content) {
+            NoteService.saveNote(currentFilename, content);
+        }
+        handleSelectNote(targetNote.filename);
+    } else {
+        const msg = `Note not found: ${targetFilename}`;
+        if (window.Android) {
+            window.Android.showToast(msg);
+        } else {
+            alert(msg);
+        }
+    }
+  };
+
   // --- Editor Handlers ---
 
   const handleSaveNote = () => {
@@ -225,6 +257,7 @@ const App: React.FC = () => {
             viewMode={viewMode}
             editorRef={editorRef}
             readOnly={isDrawing}
+            onNavigate={handleNavigate} 
         />
       </main>
 
