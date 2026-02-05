@@ -11,16 +11,24 @@ This is a pure frontend React application designed to run inside an Android `Web
 
 ## 📦 How to Package for Android
 
-1. Run the build command:
+1. Run the install command:
 
-   ```bash
-   npm run build
-   ```
+    ```bash
+    npm install react react-dom lucide-react rehype-katex rehype-slug remark-math remark-gfm react-markdown @codemirror/view @uiw/react-codemirror @codemirror/lang-markdown @codemirror/language-data katex clsx tailwind-merge
+    npm install -D tailwindcss@3.4.17 postcss autoprefixer @tailwindcss/typography
+    npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+    ```
 
-   This generates the static files in the `dist/` folder.
-2. Copy the **contents** of the `dist/` folder into your Android project's assets folder:
-   `src/main/assets/`
-3. Ensure your WebView loads `file:///android_asset/index.html` or uses the `WebViewAssetLoader` method described below (recommended).
+2. Run the build command:
+
+    ```bash
+    npm run build
+    ```
+
+    This generates the static files in the `dist/` folder.
+3. Copy the **contents** of the `dist/` folder into your Android project's assets folder:
+    `src/main/assets/`
+4. Ensure your WebView loads `file:///android_asset/index.html` or uses the `WebViewAssetLoader` method described below (recommended).
 
 ## 📱 Android Integration Guide
 
