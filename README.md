@@ -36,108 +36,116 @@ This is a pure frontend React application designed to run inside an Android `Web
 
 ```groovy
 implementation "androidx.webkit:webkit:1.9.0"
-implementation "com.google.code.gson:gson:2.10.1" // Recommended for JSON handling
+implementation "com.google.code.gson:gson:2.10.1" 
 ```
 
-### 2. The Bridge (Java/Kotlin)
+### 2. The Bridge (Kotlin Implementation)
 
-You must implement the `deleteNote` method in addition to existing ones.
+Here is the recommended **Kotlin** implementation.
+**Crucial:** Ensure `saveNote`, `loadNote`, and `deleteNote` all operate on the exact same directory (`notesDir`).
 
-```java
-public class WebAppInterface {
-    Context mContext;
+```kotlin
+package com.example.eulcauink
 
-    WebAppInterface(Context c) {
-        mContext = c;
+import android.content.Context
+import android.webkit.JavascriptInterface
+import android.widget.Toast
+import com.google.gson.Gson
+import java.io.File
+import android.util.Base64
+
+class WebAppInterface(private val context: Context) {
+
+    // Define a consistent directory for notes
+    private val notesDir: File = File(context.filesDir, "notes").apply {
+        if (!exists()) mkdirs()
+    }
+
+    // Define a consistent directory for images
+    private val imagesDir: File = File(context.filesDir, "images").apply {
+        if (!exists()) mkdirs()
     }
 
     // --- Image Handling ---
     @JavascriptInterface
-    public String saveImage(String base64Data, String filename) {
-        // ... (Existing image saving logic) ...
-        return filename; 
+    fun saveImage(base64Data: String, filename: String): String {
+        try {
+            val cleanBase64 = base64Data.substringAfter(",")
+            val bytes = Base64.decode(cleanBase64, Base64.DEFAULT)
+            val file = File(imagesDir, filename)
+            file.writeBytes(bytes)
+            return filename
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return ""
+        }
     }
 
     // --- Note Handling ---
 
     @JavascriptInterface
-    public String getNoteList() {
-        // Return a JSON array of files in the folder
-        File directory = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS); // Or custom folder
-        if (!directory.exists()) directory.mkdirs();
-        
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".md"));
-        
-        // Manual JSON construction or use Gson
-        StringBuilder json = new StringBuilder("[");
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                 // Simple JSON object: {"filename": "abc.md", "title": "abc", "updatedAt": 123}
-                json.append(String.format("{\"filename\":\"%s\", \"title\":\"%s\", \"updatedAt\": %d}", 
-                    files[i].getName(), 
-                    files[i].getName().replace(".md", ""),
-                    files[i].lastModified()
-                ));
-                if (i < files.length - 1) json.append(",");
-            }
-        }
-        json.append("]");
-        return json.toString();
+    fun getNoteList(): String {
+        val list = notesDir.listFiles()
+            ?.filter { it.extension == "md" }
+            ?.map {
+                mapOf(
+                    "filename" to it.name,
+                    "title" to it.nameWithoutExtension,
+                    "updatedAt" to it.lastModified()
+                )
+            } ?: emptyList()
+
+        return Gson().toJson(list)
     }
 
     @JavascriptInterface
-    public String loadNote(String filename) {
-        File directory = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        File file = new File(directory, filename);
-        StringBuilder text = new StringBuilder();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                text.append(line).append('\n');
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return text.toString();
+    fun loadNote(filename: String): String {
+        val file = File(notesDir, filename)
+        return if (file.exists()) file.readText() else ""
     }
 
     @JavascriptInterface
-    public void saveNote(String filename, String content) {
-        File directory = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        if (!directory.exists()) directory.mkdirs();
-        File file = new File(directory, filename);
-        
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(content.getBytes());
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    fun saveNote(filename: String, content: String) {
+        val file = File(notesDir, filename)
+        file.writeText(content)
     }
 
     @JavascriptInterface
-    public boolean deleteNote(String filename) {
-        File directory = mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        File file = new File(directory, filename);
+    fun deleteNote(filename: String): Boolean {
+        // MUST use the same notesDir as saveNote
+        val file = File(notesDir, filename)
         if (file.exists()) {
-            return file.delete();
+            return file.delete()
         }
-        return false;
+        return false
     }
 
     @JavascriptInterface
-    public void showToast(String toast) {
-        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
+    fun showToast(msg: String) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 }
 ```
 
 ### 3. WebView Setup
 
-Keep the existing `WebViewAssetLoader` setup but ensure your Android code handles both Image storage (e.g., `DIRECTORY_PICTURES`) and Document storage (e.g., `DIRECTORY_DOCUMENTS`) if you want to keep them separate, or put them in the same folder.
+Keep the existing `WebViewAssetLoader` setup. Ensure you handle the interception of image requests if you are storing images in internal storage.
+
+**Example AssetLoader Configuration (Kotlin):**
+
+```kotlin
+val assetLoader = WebViewAssetLoader.Builder()
+    .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+    // Map https://eulcauink.local/user-images/ to your internal imagesDir
+    .addPathHandler("/user-images/", WebViewAssetLoader.InternalStoragePathHandler(this, File(filesDir, "images"))) 
+    .build()
+
+webView.webViewClient = object : WebViewClient() {
+    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+        return assetLoader.shouldInterceptRequest(request.url)
+    }
+}
+```
 
 ## ✍️ Handwriting Logic
 
