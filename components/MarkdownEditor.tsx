@@ -14,7 +14,7 @@ interface MarkdownEditorProps {
   content: string;
   onChange: (val: string) => void;
   viewMode: ViewMode;
-  editorRef: React.RefObject<ReactCodeMirrorRef>;
+  editorRef: React.RefObject<ReactCodeMirrorRef | null>;
   readOnly?: boolean;
   onNavigate?: (target: string) => void;
 }

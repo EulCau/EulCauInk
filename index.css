@@ -25,14 +25,6 @@ html, body, #root {
   overflow: hidden;
 }
 
-/* Fixes the issue where checkboxes show both a bullet point and a box */
-
-/* Target lists that contain task items (added by remark-gfm) */
-.prose ul.contains-task-list {
-  list-style-type: none;
-  padding-left: 0;
-}
-
 /* Remove the default ::before pseudo-element bullet added by Tailwind Typography */
 .prose ul.contains-task-list li::before {
   display: none !important;
@@ -57,11 +49,50 @@ html, body, #root {
 
 /* Style the inline code block */
 .prose :where(code):not(:where(pre code)) {
-  background-color: rgba(175, 184, 193, 0.2); /* Light gray background */
-  color: #24292f; /* Dark text color */
+  background-color: rgba(175, 184, 193, 0.2);
+  color: #24292f;
   padding: 0.2em 0.4em;
   border-radius: 6px;
   font-size: 85%;
   font-weight: 500;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Code Block (Pre) Styling */
+
+/* Override default dark background of pre blocks to light */
+.prose pre {
+  background-color: #f6f8fa !important;
+  color: #24292f !important;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+}
+
+/* Ensure text inside code blocks is visible and reset inherited styles */
+.prose pre code {
+  background-color: transparent !important;
+  color: inherit !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875em;
+  text-shadow: none !important;
+}
+
+/* --- Blockquote Styling --- */
+
+/* Remove the default quote marks added by Tailwind Typography */
+.prose blockquote p::before {
+  content: none !important;
+}
+.prose blockquote p::after {
+  content: none !important;
+}
+
+/* Clean up blockquote style: remove italics, set color and border */
+.prose blockquote {
+  font-style: normal;
+  font-weight: 400;
+  color: #57606a;
+  border-left-width: 0.25rem;
+  border-left-color: #d0d7de;
+  quotes: none;
 }

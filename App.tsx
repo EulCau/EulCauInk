@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { PenTool, Layout, Columns, Eye, ChevronLeft, Save, Upload, Download, Image as ImageIcon, FileUp } from 'lucide-react';
+import { PenTool, Layout, Columns, Eye, ChevronLeft, Save, Download, Image as ImageIcon, FileUp } from 'lucide-react';
 import { MarkdownEditor } from './components/MarkdownEditor';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { NoteList } from './components/NoteList';
@@ -321,7 +320,7 @@ const App: React.FC = () => {
 
             <div className="flex items-center space-x-1 sm:space-x-3">
                 {/* View Mode Switcher - Hidden on very small screens */}
-                <div className="flex bg-gray-100 rounded-lg p-1 hidden md:flex">
+                <div className="flex bg-gray-100 rounded-lg p-1 md:flex">
                     <button onClick={() => setViewMode(ViewMode.EDIT_ONLY)} className={`p-1.5 rounded-md ${viewMode === ViewMode.EDIT_ONLY ? 'bg-white shadow text-blue-600' : 'text-gray-500'}`}><Layout size={18} /></button>
                     <button onClick={() => setViewMode(ViewMode.SPLIT)} className={`p-1.5 rounded-md ${viewMode === ViewMode.SPLIT ? 'bg-white shadow text-blue-600' : 'text-gray-500'}`}><Columns size={18} /></button>
                     <button onClick={() => setViewMode(ViewMode.PREVIEW_ONLY)} className={`p-1.5 rounded-md ${viewMode === ViewMode.PREVIEW_ONLY ? 'bg-white shadow text-blue-600' : 'text-gray-500'}`}><Eye size={18} /></button>
