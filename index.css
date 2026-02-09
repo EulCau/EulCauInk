@@ -44,3 +44,24 @@ html, body, #root {
   display: flex;
   align-items: flex-start;
 }
+
+/* Inline Code Styling */
+
+/* Remove the default backticks added by Tailwind Typography */
+.prose :where(code):not(:where(pre code))::before {
+  content: none !important;
+}
+.prose :where(code):not(:where(pre code))::after {
+  content: none !important;
+}
+
+/* Style the inline code block */
+.prose :where(code):not(:where(pre code)) {
+  background-color: rgba(175, 184, 193, 0.2); /* Light gray background */
+  color: #24292f; /* Dark text color */
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 85%;
+  font-weight: 500;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
