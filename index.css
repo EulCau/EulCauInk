@@ -39,17 +39,8 @@ html, body, #root {
   content: none !important;
 }
 
-/* Align the checkbox and text */
+/* Align the checkbox and text using Flexbox */
 .prose ul.contains-task-list li {
   display: flex;
   align-items: flex-start;
-  padding-left: 0;
-}
-
-/* Style the checkbox input itself */
-.prose ul.contains-task-list li input[type="checkbox"] {
-  margin-top: 0.35rem; /* Optical alignment with text */
-  margin-right: 0.5rem;
-  flex-shrink: 0;
-  cursor: pointer;
 }
