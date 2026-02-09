@@ -24,3 +24,32 @@ html, body, #root {
   margin: 0;
   overflow: hidden;
 }
+
+/* Fixes the issue where checkboxes show both a bullet point and a box */
+
+/* Target lists that contain task items (added by remark-gfm) */
+.prose ul.contains-task-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+/* Remove the default ::before pseudo-element bullet added by Tailwind Typography */
+.prose ul.contains-task-list li::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Align the checkbox and text */
+.prose ul.contains-task-list li {
+  display: flex;
+  align-items: flex-start;
+  padding-left: 0;
+}
+
+/* Style the checkbox input itself */
+.prose ul.contains-task-list li input[type="checkbox"] {
+  margin-top: 0.35rem; /* Optical alignment with text */
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
