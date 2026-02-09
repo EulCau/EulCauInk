@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a pure frontend React application designed to run inside an Android `WebView`. It features a CodeMirror markdown editor, a note list manager, and stylus handwriting support. For more details, please refer to the README in the GitHub repository: [EulCau/EulCauInkApp](https://github.com/EulCau/EulCauInkApp).
+This is a pure frontend React application designed to run inside an Android `WebView`. It features a CodeMirror Markdown editor, a note list manager, and stylus handwriting support. For more details, please refer to the README in the GitHub repository: [EulCau/EulCauInkApp](https://github.com/EulCau/EulCauInkApp).
 
 ## Web Development
 
@@ -11,7 +11,7 @@ This is a pure frontend React application designed to run inside an Android `Web
 
 ## How to Package for Android
 
-1. Run the install command:
+1. Run the installation command:
 
     ```bash
     npm install react react-dom lucide-react rehype-katex rehype-slug remark-math remark-gfm react-markdown @codemirror/view @uiw/react-codemirror @codemirror/lang-markdown @codemirror/language-data katex clsx tailwind-merge
@@ -71,7 +71,7 @@ implementation "com.google.code.gson:gson:2.10.1"
 
 ### 3. MainActivity.kt (Complete)
 
-This handles the file pickers (images, markdown import/export) and bridges communication.
+This handles the file pickers (images, Markdown import/export) and bridges communication.
 
 ```kotlin
 package com.example.eulcauink
@@ -358,4 +358,4 @@ This project is licensed under the MIT License.
 ## Acknowledgements
 
 - Open-source communities including React, Tailwind CSS, CodeMirror, and Android WebView
-- AI-assisted development with ChatGPT and google AI Studio
+- AI-assisted development with ChatGPT and Google AI Studio

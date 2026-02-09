@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Pen, Eraser, Check, X, Undo, Trash2 } from 'lucide-react';
+import { Check, X, Undo, Trash2 } from 'lucide-react';
 
 interface DrawingCanvasProps {
   onSave: (base64Data: string) => void;

@@ -1,14 +1,14 @@
 import React from 'react';
-import CodeMirror, { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
-import { languages } from '@codemirror/language-data';
-import { EditorView } from '@codemirror/view';
+import CodeMirror, {ReactCodeMirrorRef} from '@uiw/react-codemirror';
+import {markdown, markdownLanguage} from '@codemirror/lang-markdown';
+import {languages} from '@codemirror/language-data';
+import {EditorView} from '@codemirror/view';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
-import { ViewMode } from '../types';
+import {ViewMode} from '../types';
 
 interface MarkdownEditorProps {
   content: string;
@@ -125,19 +125,17 @@ const handleCheckboxChange = (lineIndex: number) => {
 
       const line = lines[lineIndex];
       // Regex to find list markers: - or * or + or 1. followed by space, then [ ] or [x]
-      const taskRegex = /^(\s*)([-*+]|\d+\.)(\s+)\[([ xX])\](.*)$/;
+      const taskRegex = /^(\s*)([-*+]|\d+\.)(\s+)\[([ xX])](.*)$/;
       
       const match = line.match(taskRegex);
       
       if (match) {
-          const [fullMatch, indent, bullet, space, status, rest] = match;
+          const [, indent, bullet, space, status, rest] = match;
           const isChecked = status.toLowerCase() === 'x';
           // Toggle status
           const newStatus = isChecked ? ' ' : 'x';
-          
-          const newLine = `${indent}${bullet}${space}[${newStatus}]${rest}`;
-          
-          lines[lineIndex] = newLine;
+
+          lines[lineIndex] = `${indent}${bullet}${space}[${newStatus}]${rest}`;
           onChange(lines.join('\n'));
       } else {
           console.warn(`[MarkdownEditor] Line ${lineIndex} did not match task regex:`, line);
@@ -232,7 +230,7 @@ const handleCheckboxChange = (lineIndex: number) => {
 
                   if (lineIndex >= 0 && lineIndex < content.split('\n').length) {
                       const line = content.split('\n')[lineIndex];
-                      const taskMatch = line.match(/^(\s*)([-*+]|\d+\.)(\s+)\[([ xX])\](\s)/);
+                      const taskMatch = line.match(/^(\s*)([-*+]|\d+\.)(\s+)\[([ xX])](\s)/);
                       if (taskMatch) {
                           isTask = true;
                           isChecked = taskMatch[4].toLowerCase() === 'x';
@@ -281,7 +279,7 @@ const handleCheckboxChange = (lineIndex: number) => {
                             // Optional: Insert a text placeholder or icon here if needed
                             target.parentElement?.insertAdjacentHTML('beforeend', `<span class="text-red-500 text-sm p-2 border border-red-200 rounded bg-red-50 block">Image failed to load: ${target.src}</span>`);
                         }}
-                    />
+                     alt={""}/>
                 </span>
               )
             }}

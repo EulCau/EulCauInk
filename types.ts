@@ -1,4 +1,3 @@
-
 export enum ViewMode {
   EDIT_ONLY = 'EDIT_ONLY',
   SPLIT = 'SPLIT',
